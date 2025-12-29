@@ -160,10 +160,10 @@
         <div class="card">
             <h1>{{ watcher.doctor_name }}</h1>
             <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
-                {{ '✓ Active' if watcher.is_active else '✗ Inactive' }}
+                {{ '✓ Aktívne' if watcher.is_active else '✗ Neaktívne' }}
             </span>
             <div style="margin-top: 8px;">
-                <a href="{{ watcher.doctor_url }}" target="_blank" class="text-blue-600 text-sm" style="color: #3b82f6; text-decoration: none;">View on navstevalekara.sk →</a>
+                <a href="{{ watcher.doctor_url }}" target="_blank" class="text-blue-600 text-sm" style="color: #3b82f6; text-decoration: none;">Zobraziť na navstevalekara.sk →</a>
             </div>
 
             <div class="url-box">
@@ -174,58 +174,58 @@
                     onclick="this.select()"
                     id="watcher-url"
                 >
-                <button class="btn btn-secondary" onclick="copyUrl()">Copy URL</button>
+                <button class="btn btn-secondary" onclick="copyUrl()">Kopírovať URL</button>
             </div>
 
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Doctor Code</div>
+                    <div class="info-label">Kód lekára</div>
                     <div class="info-value">{{ watcher.doctor_code }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Last Check</div>
+                    <div class="info-label">Posledná kontrola</div>
                     <div class="info-value">
                         {% if watcher.last_check_at %}
                             {{ watcher.last_check_at.strftime('%Y-%m-%d %H:%M') }}
                         {% else %}
-                            Never
+                            Nikdy
                         {% endif %}
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Created</div>
+                    <div class="info-label">Vytvorené</div>
                     <div class="info-value">{{ watcher.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
                 </div>
             </div>
 
             <div style="margin: 20px 0;">
-                <div class="info-label">Target Dates</div>
+                <div class="info-label">Sledované dátumy</div>
                 <div class="info-value">{{ target_dates | join(', ') }}</div>
             </div>
 
             <div class="actions">
                 <form method="POST" action="/w/{{ watcher.uuid }}/toggle" style="display: inline;">
                     <button type="submit" class="btn btn-primary">
-                        {{ 'Deactivate' if watcher.is_active else 'Activate' }}
+                        {{ 'Deaktivovať' if watcher.is_active else 'Aktivovať' }}
                     </button>
                 </form>
-                <form method="POST" action="/w/{{ watcher.uuid }}/delete" onsubmit="return confirm('Are you sure you want to delete this watcher?');" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                <form method="POST" action="/w/{{ watcher.uuid }}/delete" onsubmit="return confirm('Naozaj chcete vymazať toto sledovanie?');" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Vymazať</button>
                 </form>
-                <a href="/" class="btn btn-secondary">Create New</a>
+                <a href="/" class="btn btn-secondary">Vytvoriť nové</a>
             </div>
         </div>
 
         <div class="card">
-            <div class="section-title">Found Slots ({{ notified_slots | length }})</div>
+            <div class="section-title">Nájdené termíny ({{ notified_slots | length }})</div>
 
             {% if notified_slots %}
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Notified At</th>
+                            <th>Dátum</th>
+                            <th>Čas</th>
+                            <th>Notifikované</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -240,7 +240,7 @@
                 </table>
             {% else %}
                 <div class="empty-state">
-                    No slots found yet. The watcher checks every 5 minutes.
+                    Zatiaľ neboli nájdené žiadne termíny. Sledovanie kontroluje každých 5 minút.
                 </div>
             {% endif %}
         </div>
@@ -251,7 +251,7 @@
             const input = document.getElementById('watcher-url');
             input.select();
             document.execCommand('copy');
-            alert('URL copied to clipboard!');
+            alert('URL skopírované do schránky!');
         }
     </script>
 </body>

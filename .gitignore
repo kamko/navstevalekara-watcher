@@ -47,3 +47,6 @@ watchers.db
 # OS
 .DS_Store
 Thumbs.db
+
+# IDE/Tools
+.claude/

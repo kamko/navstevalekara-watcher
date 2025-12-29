@@ -343,7 +343,7 @@ def parse_date_input(date_input: str) -> List[str]:
 async def create_watcher(
     request: Request,
     doctor_url: str = Form(...),
-    date_input: str = Form(...),
+    target_dates: List[str] = Form(...),
     telegram_bot_token: str = Form(...),
     telegram_chat_id: str = Form(...)
 ):
@@ -364,11 +364,22 @@ async def create_watcher(
         else:
             doctor_name = f"Doctor {doctor_code}"
 
-        # Parse date input (supports both exact dates and week ranges)
-        try:
-            dates = parse_date_input(date_input)
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
+        # Validate and deduplicate dates
+        validated_dates = []
+        for date_str in target_dates:
+            if not date_str:  # Skip empty values
+                continue
+            try:
+                datetime.strptime(date_str, '%Y-%m-%d')
+                if date_str not in validated_dates:
+                    validated_dates.append(date_str)
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Neplatný dátum: {date_str}")
+
+        if not validated_dates:
+            raise HTTPException(status_code=400, detail="Musíte vybrať aspoň jeden dátum")
+
+        dates = validated_dates
 
         # Generate UUID
         watcher_uuid = str(uuid.uuid4())
@@ -515,6 +526,44 @@ async def delete_watcher(watcher_uuid: str):
         print(f"Deleted watcher {watcher.id}")
 
         return RedirectResponse(url="/", status_code=303)
+
+    finally:
+        db.close()
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_panel(request: Request):
+    """Secret admin panel to view and manage all watchers."""
+    db = SessionLocal()
+    try:
+        # Get all watchers
+        watchers = db.query(Watcher).order_by(Watcher.created_at.desc()).all()
+
+        # Calculate stats
+        total_watchers = len(watchers)
+        active_watchers = sum(1 for w in watchers if w.is_active)
+        total_slots = db.query(NotifiedSlot).count()
+
+        # Enrich watcher data
+        enriched_watchers = []
+        for watcher in watchers:
+            target_dates = json.loads(watcher.target_dates)
+            slots_count = db.query(NotifiedSlot).filter(
+                NotifiedSlot.watcher_id == watcher.id
+            ).count()
+
+            enriched_watcher = watcher
+            enriched_watcher.target_dates_count = len(target_dates)
+            enriched_watcher.slots_count = slots_count
+            enriched_watchers.append(enriched_watcher)
+
+        return templates.TemplateResponse("admin.html", {
+            "request": request,
+            "watchers": enriched_watchers,
+            "total_watchers": total_watchers,
+            "active_watchers": active_watchers,
+            "total_slots": total_slots
+        })
 
     finally:
         db.close()

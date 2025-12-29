@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Appointment Watcher</title>
+    <title>navstevalekara.sk Watcher</title>
     <style>
         * {
             margin: 0;
@@ -92,31 +92,37 @@
 <body>
     <div class="container">
         <div class="card">
-            <h1>🏥 Doctor Appointment Watcher</h1>
-            <p class="subtitle">Create a watcher to monitor appointment availability</p>
+            <h1>🏥 navstevalekara.sk Watcher</h1>
+            <p class="subtitle">Vytvorte sledovanie voľných termínov u lekára</p>
 
             <form method="POST" action="/create">
                 <div class="form-group">
-                    <label for="doctor_url">Doctor URL</label>
+                    <label for="doctor_url">URL lekára</label>
                     <input
                         type="url"
                         id="doctor_url"
                         name="doctor_url"
                         required
-                        placeholder="https://www.navstevalekara.sk/lekari/.../doctor-name-d15313.html"
+                        placeholder="https://www.navstevalekara.sk/lekari/.../meno-lekara-d15313.html"
                     >
-                    <p class="help-text">Paste the full URL from navstevalekara.sk</p>
+                    <p class="help-text">Vložte celú URL adresu z navstevalekara.sk</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="date_input">Dates or Week Range</label>
-                    <textarea
-                        id="date_input"
-                        name="date_input"
-                        required
-                        placeholder="Option 1: Week range (e.g., 0-3 for current week + 3 weeks)&#10;Option 2: Exact dates:&#10;2026-01-12&#10;2026-01-13"
-                    ></textarea>
-                    <p class="help-text">Week range (e.g., "0-3") or exact dates (one per line, YYYY-MM-DD)</p>
+                    <label for="target_dates">Sledované dátumy</label>
+                    <div id="date-picker-container">
+                        <div class="date-input-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input
+                                type="date"
+                                name="target_dates[]"
+                                required
+                                class="date-input"
+                                style="flex: 1;"
+                            >
+                            <button type="button" onclick="addDateInput()" class="add-date-btn" style="padding: 10px 16px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer;">+ Pridať dátum</button>
+                        </div>
+                    </div>
+                    <p class="help-text">Vyberte jeden alebo viac dátumov na sledovanie</p>
                 </div>
 
                 <div class="form-group">
@@ -141,9 +147,29 @@
                     >
                 </div>
 
-                <button type="submit">Create Watcher</button>
+                <button type="submit">Vytvoriť sledovanie</button>
             </form>
         </div>
     </div>
+
+    <script>
+        function addDateInput() {
+            const container = document.getElementById('date-picker-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'date-input-row';
+            newRow.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px;';
+            newRow.innerHTML = `
+                <input
+                    type="date"
+                    name="target_dates[]"
+                    required
+                    class="date-input"
+                    style="flex: 1;"
+                >
+                <button type="button" onclick="this.parentElement.remove()" class="remove-date-btn" style="padding: 10px 16px; background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Odstrániť</button>
+            `;
+            container.appendChild(newRow);
+        }
+    </script>
 </body>
 </html>

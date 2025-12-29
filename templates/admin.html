@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - navstevalekara.sk Watcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 4px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .stat-box {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px;
+            background: #f7fafc;
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 12px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #2d3748;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-badge.inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        .btn-secondary {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        .doctor-name {
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .doctor-code {
+            font-size: 12px;
+            color: #718096;
+        }
+        .watcher-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .watcher-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin Panel</h1>
+            <p class="subtitle">Správa všetkých sledovaní</p>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Celkovo sledovaní</div>
+                    <div class="stat-value">{{ total_watchers }}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Aktívnych</div>
+                    <div class="stat-value">{{ active_watchers }}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Nájdených termínov</div>
+                    <div class="stat-value">{{ total_slots }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            {% if watchers %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lekár</th>
+                            <th>Stav</th>
+                            <th>Sledované dátumy</th>
+                            <th>Posledná kontrola</th>
+                            <th>Vytvorené</th>
+                            <th>Termíny</th>
+                            <th>Akcie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for watcher in watchers %}
+                        <tr>
+                            <td>
+                                <div class="doctor-name">{{ watcher.doctor_name }}</div>
+                                <div class="doctor-code">Kód: {{ watcher.doctor_code }}</div>
+                                <a href="/w/{{ watcher.uuid }}" target="_blank" class="watcher-link">Zobraziť detail →</a>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
+                                    {{ '✓ Aktívne' if watcher.is_active else '✗ Neaktívne' }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ watcher.target_dates_count }} {{ 'dátum' if watcher.target_dates_count == 1 else 'dátumy' if watcher.target_dates_count <= 4 else 'dátumov' }}
+                            </td>
+                            <td>
+                                {% if watcher.last_check_at %}
+                                    {{ watcher.last_check_at.strftime('%Y-%m-%d %H:%M') }}
+                                {% else %}
+                                    Nikdy
+                                {% endif %}
+                            </td>
+                            <td>{{ watcher.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ watcher.slots_count }}</td>
+                            <td>
+                                <form method="POST" action="/w/{{ watcher.uuid }}/toggle" style="display: inline;">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ 'Vypnúť' if watcher.is_active else 'Zapnúť' }}
+                                    </button>
+                                </form>
+                                <form method="POST" action="/w/{{ watcher.uuid }}/delete" onsubmit="return confirm('Naozaj vymazať sledovanie pre {{ watcher.doctor_name }}?');" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Vymazať</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    Žiadne sledovania ešte neboli vytvorené.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
