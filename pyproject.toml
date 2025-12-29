@@ -1,0 +1,14 @@
+[project]
+name = "navstevalekara-notif"
+version = "0.1.0"
+description = "Doctor appointment watcher SaaS - monitors navstevalekara.sk for available slots"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "sqlalchemy",
+    "apscheduler",
+    "requests",
+    "beautifulsoup4",
+    "jinja2",
+]
