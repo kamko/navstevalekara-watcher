@@ -2,14 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install uv using pip
+RUN pip install --no-cache-dir uv
 
 # Copy dependency files
 COPY pyproject.toml .
 
-# Install dependencies
-RUN uv pip install --system -r pyproject.toml
+# Install dependencies using uv
+RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy application files
 COPY app.py .
