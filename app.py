@@ -401,6 +401,11 @@ async def create_watcher(
 
         print(f"Created watcher {watcher.id} - {watcher.doctor_name}")
 
+        # Run check immediately
+        import threading
+        threading.Thread(target=check_watcher_job, args=[watcher.id], daemon=True).start()
+        print(f"Triggered immediate check for watcher {watcher.id}")
+
         return RedirectResponse(url=f"/w/{watcher_uuid}", status_code=303)
 
     except Exception as e:
