@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ watcher.doctor_name }} - Watcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 4px;
+            font-size: 24px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .status-badge.active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-badge.inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .info-item {
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 14px;
+            color: #1a202c;
+            font-weight: 500;
+        }
+        .url-box {
+            background: #edf2f7;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .url-box input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        .btn-secondary {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px;
+            background: #f7fafc;
+            font-size: 12px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 12px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #2d3748;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a202c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>{{ watcher.doctor_name }}</h1>
+            <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
+                {{ '✓ Active' if watcher.is_active else '✗ Inactive' }}
+            </span>
+
+            <div class="url-box">
+                <input
+                    type="text"
+                    value="{{ request.url }}"
+                    readonly
+                    onclick="this.select()"
+                    id="watcher-url"
+                >
+                <button class="btn btn-secondary" onclick="copyUrl()">Copy URL</button>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Doctor Code</div>
+                    <div class="info-value">{{ watcher.doctor_code }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Last Check</div>
+                    <div class="info-value">
+                        {% if watcher.last_check_at %}
+                            {{ watcher.last_check_at.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Created</div>
+                    <div class="info-value">{{ watcher.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <div class="info-label">Target Dates</div>
+                <div class="info-value">{{ target_dates | join(', ') }}</div>
+            </div>
+
+            <div class="actions">
+                <form method="POST" action="/w/{{ watcher.uuid }}/toggle" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">
+                        {{ 'Deactivate' if watcher.is_active else 'Activate' }}
+                    </button>
+                </form>
+                <form method="POST" action="/w/{{ watcher.uuid }}/delete" onsubmit="return confirm('Are you sure you want to delete this watcher?');" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <a href="/" class="btn btn-secondary">Create New</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">Found Slots ({{ notified_slots | length }})</div>
+
+            {% if notified_slots %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Notified At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in notified_slots %}
+                        <tr>
+                            <td>{{ slot.date }}</td>
+                            <td>{{ slot.time }}</td>
+                            <td>{{ slot.notified_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    No slots found yet. The watcher checks every 5 minutes.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const input = document.getElementById('watcher-url');
+            input.select();
+            document.execCommand('copy');
+            alert('URL copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointment Watcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a202c;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #718096;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🏥 Doctor Appointment Watcher</h1>
+            <p class="subtitle">Create a watcher to monitor appointment availability</p>
+
+            <form method="POST" action="/create">
+                <div class="form-group">
+                    <label for="doctor_name">Doctor Name</label>
+                    <input
+                        type="text"
+                        id="doctor_name"
+                        name="doctor_name"
+                        required
+                        placeholder="e.g., MUDr. Radmila Sladičeková, PhD., MPH"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="doctor_code">Doctor Code</label>
+                    <input
+                        type="text"
+                        id="doctor_code"
+                        name="doctor_code"
+                        required
+                        placeholder="e.g., 15313"
+                    >
+                    <p class="help-text">Find this in the network request (dc parameter) or URL</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="target_dates">Target Dates</label>
+                    <textarea
+                        id="target_dates"
+                        name="target_dates"
+                        required
+                        placeholder="2026-01-12&#10;2026-01-13"
+                    ></textarea>
+                    <p class="help-text">One date per line in YYYY-MM-DD format</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="telegram_bot_token">Telegram Bot Token</label>
+                    <input
+                        type="text"
+                        id="telegram_bot_token"
+                        name="telegram_bot_token"
+                        required
+                        placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="telegram_chat_id">Telegram Chat ID</label>
+                    <input
+                        type="text"
+                        id="telegram_chat_id"
+                        name="telegram_chat_id"
+                        required
+                        placeholder="-1003324136131"
+                    >
+                </div>
+
+                <button type="submit">Create Watcher</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
