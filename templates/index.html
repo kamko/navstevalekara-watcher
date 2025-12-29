@@ -97,37 +97,26 @@
 
             <form method="POST" action="/create">
                 <div class="form-group">
-                    <label for="doctor_name">Doctor Name</label>
+                    <label for="doctor_url">Doctor URL</label>
                     <input
-                        type="text"
-                        id="doctor_name"
-                        name="doctor_name"
+                        type="url"
+                        id="doctor_url"
+                        name="doctor_url"
                         required
-                        placeholder="e.g., MUDr. Radmila Sladičeková, PhD., MPH"
+                        placeholder="https://www.navstevalekara.sk/lekari/.../doctor-name-d15313.html"
                     >
+                    <p class="help-text">Paste the full URL from navstevalekara.sk</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="doctor_code">Doctor Code</label>
-                    <input
-                        type="text"
-                        id="doctor_code"
-                        name="doctor_code"
-                        required
-                        placeholder="e.g., 15313"
-                    >
-                    <p class="help-text">Find this in the network request (dc parameter) or URL</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="target_dates">Target Dates</label>
+                    <label for="date_input">Dates or Week Range</label>
                     <textarea
-                        id="target_dates"
-                        name="target_dates"
+                        id="date_input"
+                        name="date_input"
                         required
-                        placeholder="2026-01-12&#10;2026-01-13"
+                        placeholder="Option 1: Week range (e.g., 0-3 for current week + 3 weeks)&#10;Option 2: Exact dates:&#10;2026-01-12&#10;2026-01-13"
                     ></textarea>
-                    <p class="help-text">One date per line in YYYY-MM-DD format</p>
+                    <p class="help-text">Week range (e.g., "0-3") or exact dates (one per line, YYYY-MM-DD)</p>
                 </div>
 
                 <div class="form-group">

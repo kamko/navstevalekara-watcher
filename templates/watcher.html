@@ -162,6 +162,9 @@
             <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
                 {{ '✓ Active' if watcher.is_active else '✗ Inactive' }}
             </span>
+            <div style="margin-top: 8px;">
+                <a href="{{ watcher.doctor_url }}" target="_blank" class="text-blue-600 text-sm" style="color: #3b82f6; text-decoration: none;">View on navstevalekara.sk →</a>
+            </div>
 
             <div class="url-box">
                 <input

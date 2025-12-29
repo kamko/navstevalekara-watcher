@@ -34,6 +34,7 @@ class Watcher(Base):
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String(36), unique=True, index=True, nullable=False)
     doctor_name = Column(String(255), nullable=False)
+    doctor_url = Column(String(500), nullable=False)  # Added doctor URL
     doctor_code = Column(String(50), nullable=False)
     target_dates = Column(String, nullable=False)  # JSON string
     telegram_bot_token = Column(String(255), nullable=False)
@@ -224,8 +225,8 @@ def check_watcher_job(watcher_id: int):
             print(f"Target dates {target_dates} are in the past. Nothing to check.")
             return
 
-        # Construct doctor URL (we'll simplify this - user can provide the full URL)
-        doctor_url = f"https://www.navstevalekara.sk/lekari/d{watcher.doctor_code}.html"
+        # Use the stored doctor URL
+        doctor_url = watcher.doctor_url
 
         # Check all weeks
         all_slots = []
@@ -293,27 +294,81 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post("/create")
-async def create_watcher(
-    request: Request,
-    doctor_name: str = Form(...),
-    doctor_code: str = Form(...),
-    target_dates: str = Form(...),
-    telegram_bot_token: str = Form(...),
-    telegram_chat_id: str = Form(...)
-):
-    """Create a new watcher."""
-    db = SessionLocal()
-    try:
-        # Parse target dates (one per line)
-        dates = [d.strip() for d in target_dates.strip().split('\n') if d.strip()]
+def extract_doctor_code(url: str) -> str:
+    """Extract doctor code from navstevalekara.sk URL."""
+    # URL format: ...d15313.html or ...d84.html
+    import re
+    match = re.search(r'-d(\d+)\.html$', url)
+    if not match:
+        raise ValueError("Could not extract doctor code from URL. URL must end with '-dXXX.html'")
+    return match.group(1)
+
+
+def parse_date_input(date_input: str) -> List[str]:
+    """Parse date input - supports exact dates or week ranges."""
+    from datetime import datetime, timedelta
+
+    date_input = date_input.strip()
+    dates = []
+
+    # Check if it's a week range (e.g., "0-3")
+    if re.match(r'^\d+-\d+$', date_input):
+        start_week, end_week = map(int, date_input.split('-'))
+        today = datetime.now().date()
+
+        # Calculate start of current week (Monday)
+        days_since_monday = today.weekday()
+        week_start = today - timedelta(days=days_since_monday)
+
+        # Generate all dates in the week range
+        for week in range(start_week, end_week + 1):
+            for day in range(7):  # All days of the week
+                date = week_start + timedelta(weeks=week, days=day)
+                dates.append(date.strftime('%Y-%m-%d'))
+    else:
+        # Exact dates (one per line)
+        dates = [d.strip() for d in date_input.split('\n') if d.strip()]
 
         # Validate dates
         for date_str in dates:
             try:
                 datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
-                raise HTTPException(status_code=400, detail=f"Invalid date format: {date_str}. Use YYYY-MM-DD")
+                raise ValueError(f"Invalid date format: {date_str}. Use YYYY-MM-DD or week range (e.g., 0-3)")
+
+    return dates
+
+
+@app.post("/create")
+async def create_watcher(
+    request: Request,
+    doctor_url: str = Form(...),
+    date_input: str = Form(...),
+    telegram_bot_token: str = Form(...),
+    telegram_chat_id: str = Form(...)
+):
+    """Create a new watcher."""
+    db = SessionLocal()
+    try:
+        # Extract doctor code from URL
+        try:
+            doctor_code = extract_doctor_code(doctor_url)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Extract doctor name from URL (the part before -d)
+        doctor_name_match = re.search(r'/([^/]+)-d\d+\.html$', doctor_url)
+        if doctor_name_match:
+            # Convert URL-friendly name to readable name
+            doctor_name = doctor_name_match.group(1).replace('-', ' ').title()
+        else:
+            doctor_name = f"Doctor {doctor_code}"
+
+        # Parse date input (supports both exact dates and week ranges)
+        try:
+            dates = parse_date_input(date_input)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
         # Generate UUID
         watcher_uuid = str(uuid.uuid4())
@@ -322,6 +377,7 @@ async def create_watcher(
         watcher = Watcher(
             uuid=watcher_uuid,
             doctor_name=doctor_name,
+            doctor_url=doctor_url,
             doctor_code=doctor_code,
             target_dates=json.dumps(dates),
             telegram_bot_token=telegram_bot_token,
