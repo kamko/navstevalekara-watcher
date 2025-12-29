@@ -6,7 +6,7 @@ services:
     ports:
       - "9789:8000"
     volumes:
-      - watcher-data:/app
+      - watcher-data:/app/data
     restart: unless-stopped
 
 volumes:
