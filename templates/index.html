@@ -87,6 +87,75 @@
         button:active {
             transform: translateY(0);
         }
+        .add-date-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .add-date-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+        .add-date-btn:active {
+            transform: translateY(0);
+        }
+        .remove-date-btn {
+            padding: 10px 16px;
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .remove-date-btn:hover {
+            background: #fecaca;
+        }
+        .date-range-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 2px dashed #cbd5e0;
+        }
+        .date-range-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        .date-range-inputs {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .date-range-inputs input {
+            flex: 1;
+        }
+        .add-range-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .add-range-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .add-range-btn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -119,10 +188,20 @@
                                 class="date-input"
                                 style="flex: 1;"
                             >
-                            <button type="button" onclick="addDateInput()" class="add-date-btn" style="padding: 10px 16px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer;">+ Pridať dátum</button>
+                            <button type="button" onclick="addDateInput()" class="add-date-btn">+ Pridať dátum</button>
                         </div>
                     </div>
                     <p class="help-text">Vyberte jeden alebo viac dátumov na sledovanie</p>
+
+                    <div class="date-range-section">
+                        <div class="date-range-label">Alebo vyberte rozsah dátumov</div>
+                        <div class="date-range-inputs">
+                            <input type="date" id="range-from" placeholder="Od">
+                            <span style="color: #718096;">→</span>
+                            <input type="date" id="range-to" placeholder="Do">
+                            <button type="button" onclick="addDateRange()" class="add-range-btn">Pridať rozsah</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -166,9 +245,77 @@
                     class="date-input"
                     style="flex: 1;"
                 >
-                <button type="button" onclick="this.parentElement.remove()" class="remove-date-btn" style="padding: 10px 16px; background: #fee2e2; color: #991b1b; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Odstrániť</button>
+                <button type="button" onclick="this.parentElement.remove()" class="remove-date-btn">Odstrániť</button>
             `;
             container.appendChild(newRow);
+        }
+
+        function addDateRange() {
+            const fromInput = document.getElementById('range-from');
+            const toInput = document.getElementById('range-to');
+
+            const fromDate = fromInput.value;
+            const toDate = toInput.value;
+
+            if (!fromDate || !toDate) {
+                alert('Prosím vyberte oba dátumy (od a do)');
+                return;
+            }
+
+            const from = new Date(fromDate);
+            const to = new Date(toDate);
+
+            if (from > to) {
+                alert('Dátum "od" musí byť pred dátumom "do"');
+                return;
+            }
+
+            // Get existing dates to avoid duplicates
+            const existingInputs = document.querySelectorAll('input[name="target_dates[]"]');
+            const existingDates = new Set();
+            existingInputs.forEach(input => {
+                if (input.value) {
+                    existingDates.add(input.value);
+                }
+            });
+
+            // Add all dates in range
+            const container = document.getElementById('date-picker-container');
+            let addedCount = 0;
+
+            const currentDate = new Date(from);
+            while (currentDate <= to) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+
+                // Only add if not already exists
+                if (!existingDates.has(dateStr)) {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'date-input-row';
+                    newRow.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px;';
+                    newRow.innerHTML = `
+                        <input
+                            type="date"
+                            name="target_dates[]"
+                            value="${dateStr}"
+                            required
+                            class="date-input"
+                            style="flex: 1;"
+                        >
+                        <button type="button" onclick="this.parentElement.remove()" class="remove-date-btn">Odstrániť</button>
+                    `;
+                    container.appendChild(newRow);
+                    existingDates.add(dateStr);
+                    addedCount++;
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Clear range inputs
+            fromInput.value = '';
+            toInput.value = '';
+
+            alert(`Pridaných ${addedCount} dátumov`);
         }
     </script>
 </body>
