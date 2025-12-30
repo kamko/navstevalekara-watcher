@@ -153,6 +153,32 @@
             margin-bottom: 16px;
             color: #1a202c;
         }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.available {
+            background: #48bb78;
+        }
+        .status-indicator.unavailable {
+            background: #f56565;
+        }
+        .slot-row.unavailable {
+            background: #fef2f2;
+        }
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .checking-status {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 12px;
+            color: #718096;
+        }
     </style>
 </head>
 <body>
@@ -217,32 +243,39 @@
         </div>
 
         <div class="card">
-            <div class="section-title">Nájdené termíny ({{ notified_slots | length }})</div>
+            <div class="section-title">
+                Nájdené termíny (<span id="slots-count">{{ notified_slots | length }}</span>)
+                <span class="checking-status" id="checking-status"></span>
+            </div>
 
-            {% if notified_slots %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Dátum</th>
-                            <th>Čas</th>
-                            <th>Notifikované</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for slot in notified_slots %}
-                        <tr>
-                            <td>{{ slot.date }}</td>
-                            <td>{{ slot.time }}</td>
-                            <td>{{ slot.notified_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div class="empty-state">
-                    Zatiaľ neboli nájdené žiadne termíny. Sledovanie kontroluje každých 5 minút.
-                </div>
-            {% endif %}
+            <div id="slots-table-container">
+                {% if notified_slots %}
+                    <table id="slots-table">
+                        <thead>
+                            <tr>
+                                <th>Stav</th>
+                                <th>Dátum</th>
+                                <th>Čas</th>
+                                <th>Notifikované</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slots-tbody">
+                            {% for slot in notified_slots %}
+                            <tr class="slot-row" data-slot-id="{{ slot.id }}">
+                                <td><span class="status-indicator available"></span> Voľný</td>
+                                <td>{{ slot.date }}</td>
+                                <td>{{ slot.time }}</td>
+                                <td>{{ slot.notified_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state" id="empty-state">
+                        Zatiaľ neboli nájdené žiadne termíny. Sledovanie kontroluje každých 5 minút.
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -253,6 +286,107 @@
             document.execCommand('copy');
             alert('URL skopírované do schránky!');
         }
+
+        // AJAX polling for slot availability
+        let isChecking = false;
+
+        async function checkSlotAvailability() {
+            if (isChecking) return;
+
+            isChecking = true;
+            const statusEl = document.getElementById('checking-status');
+            statusEl.textContent = '⟳ Kontrolujem...';
+
+            try {
+                const response = await fetch(window.location.pathname + '/slots');
+                const data = await response.json();
+
+                updateSlotsTable(data.slots);
+
+                statusEl.textContent = '✓ Aktualizované';
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error checking slots:', error);
+                statusEl.textContent = '✗ Chyba';
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                }, 2000);
+            } finally {
+                isChecking = false;
+            }
+        }
+
+        function updateSlotsTable(slots) {
+            const tbody = document.getElementById('slots-tbody');
+            const countEl = document.getElementById('slots-count');
+            const emptyState = document.getElementById('empty-state');
+            const tableContainer = document.getElementById('slots-table-container');
+
+            countEl.textContent = slots.length;
+
+            if (slots.length === 0) {
+                if (tbody) {
+                    tableContainer.innerHTML = '<div class="empty-state" id="empty-state">Zatiaľ neboli nájdené žiadne termíny. Sledovanie kontroluje každých 5 minút.</div>';
+                }
+                return;
+            }
+
+            // If we have slots but no table, create one
+            if (!tbody) {
+                tableContainer.innerHTML = `
+                    <table id="slots-table">
+                        <thead>
+                            <tr>
+                                <th>Stav</th>
+                                <th>Dátum</th>
+                                <th>Čas</th>
+                                <th>Notifikované</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slots-tbody"></tbody>
+                    </table>
+                `;
+            }
+
+            const tbodyEl = document.getElementById('slots-tbody');
+            tbodyEl.innerHTML = '';
+
+            slots.forEach(slot => {
+                const row = document.createElement('tr');
+                row.className = slot.is_still_available ? 'slot-row' : 'slot-row unavailable';
+                row.dataset.slotId = slot.id;
+
+                const statusText = slot.is_still_available ? 'Voľný' : 'Obsadený';
+                const statusClass = slot.is_still_available ? 'available' : 'unavailable';
+
+                const notifiedDate = new Date(slot.notified_at);
+                const formattedDate = notifiedDate.toLocaleString('sk-SK', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).replace(',', '');
+
+                row.innerHTML = `
+                    <td><span class="status-indicator ${statusClass}"></span> ${statusText}</td>
+                    <td>${slot.date}</td>
+                    <td>${slot.time}</td>
+                    <td>${formattedDate}</td>
+                `;
+
+                tbodyEl.appendChild(row);
+            });
+        }
+
+        // Check immediately on page load
+        setTimeout(() => checkSlotAvailability(), 1000);
+
+        // Then check every 30 seconds
+        setInterval(checkSlotAvailability, 30000);
     </script>
 </body>
 </html>

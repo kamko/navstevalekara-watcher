@@ -52,6 +52,7 @@ class NotifiedSlot(Base):
     date = Column(String(10), nullable=False)  # YYYY-MM-DD
     time = Column(String(5), nullable=False)   # HH:MM
     notified_at = Column(DateTime, default=datetime.utcnow)
+    is_still_available = Column(Boolean, default=True)  # Track if slot is still available
 
     __table_args__ = (
         UniqueConstraint('watcher_id', 'date', 'time', name='_watcher_slot_uc'),
@@ -268,12 +269,36 @@ def check_watcher_job(watcher_id: int):
                     notified = NotifiedSlot(
                         watcher_id=watcher.id,
                         date=slot['date'],
-                        time=slot['time']
+                        time=slot['time'],
+                        is_still_available=True
                     )
                     db.add(notified)
                 db.commit()
         else:
             print(f"No new slots found")
+
+        # Auto-delete unavailable slots so they can be re-notified when they become available again
+        currently_available_set = set()
+        for slot in all_slots:
+            currently_available_set.add(f"{slot['date']}_{slot['time']}")
+
+        # Get all notified slots for this watcher
+        all_notified_slots = db.query(NotifiedSlot).filter(
+            NotifiedSlot.watcher_id == watcher.id
+        ).all()
+
+        # Delete slots that are no longer available
+        deleted_count = 0
+        for notified_slot in all_notified_slots:
+            slot_key = f"{notified_slot.date}_{notified_slot.time}"
+            if slot_key not in currently_available_set:
+                # Slot is no longer available - delete it
+                db.delete(notified_slot)
+                deleted_count += 1
+
+        if deleted_count > 0:
+            db.commit()
+            print(f"Auto-deleted {deleted_count} unavailable slot(s)")
 
         # Update last check time
         watcher.last_check_at = datetime.utcnow()
@@ -527,6 +552,63 @@ async def delete_watcher(watcher_uuid: str):
 
         return RedirectResponse(url="/", status_code=303)
 
+    finally:
+        db.close()
+
+
+@app.get("/w/{watcher_uuid}/slots")
+async def get_notified_slots(watcher_uuid: str):
+    """Get all notified slots with their current availability status (read-only)."""
+    db = SessionLocal()
+    try:
+        watcher = db.query(Watcher).filter(Watcher.uuid == watcher_uuid).first()
+
+        if not watcher:
+            raise HTTPException(status_code=404, detail="Watcher not found")
+
+        # Get all notified slots
+        notified_slots = db.query(NotifiedSlot).filter(
+            NotifiedSlot.watcher_id == watcher.id
+        ).order_by(NotifiedSlot.notified_at.desc()).all()
+
+        # Get target dates for filtering
+        target_dates = json.loads(watcher.target_dates)
+        week_offsets = calculate_week_offsets_for_dates(target_dates)
+
+        # Check current availability
+        currently_available_slots = []
+        for week in week_offsets:
+            html_content = check_appointments(watcher.doctor_code, watcher.doctor_url, week)
+            if html_content:
+                slots = parse_available_slots(html_content)
+                # Filter to only target dates
+                filtered_slots = [s for s in slots if s['date'] in target_dates]
+                currently_available_slots.extend(filtered_slots)
+
+        # Create a set of currently available slot identifiers
+        available_set = set()
+        for slot in currently_available_slots:
+            available_set.add(f"{slot['date']}_{slot['time']}")
+
+        # Build result with current availability status
+        result_slots = []
+        for notified_slot in notified_slots:
+            slot_key = f"{notified_slot.date}_{notified_slot.time}"
+            is_available = slot_key in available_set
+
+            result_slots.append({
+                "id": notified_slot.id,
+                "date": notified_slot.date,
+                "time": notified_slot.time,
+                "notified_at": notified_slot.notified_at.isoformat(),
+                "is_still_available": is_available
+            })
+
+        return {"slots": result_slots}
+
+    except Exception as e:
+        print(f"Error getting slots: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
 
