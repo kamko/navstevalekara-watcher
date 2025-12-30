@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ watcher.doctor_name }} - Watcher</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         * {
             margin: 0;
@@ -160,6 +161,19 @@
             font-size: 12px;
             color: #718096;
         }
+        .flatpickr-calendar {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+        }
+        .flatpickr-day.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-color: #667eea !important;
+        }
+        .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-color: #667eea !important;
+        }
     </style>
 </head>
 <body>
@@ -216,8 +230,8 @@
             </div>
 
             <div style="margin: 20px 0;">
-                <div class="info-label">Sledované dátumy</div>
-                <div class="info-value">{{ target_dates | join(', ') }}</div>
+                <div class="info-label" style="margin-bottom: 12px;">Sledované dátumy</div>
+                <input type="text" id="watcher-datepicker" style="display: none;">
             </div>
 
             <div class="actions">
@@ -369,6 +383,32 @@
 
         // Then check every 30 seconds
         setInterval(checkSlotAvailability, 30000);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Initialize flatpickr for watcher view (readonly)
+        const targetDates = {{ target_dates | tojson }};
+
+        flatpickr("#watcher-datepicker", {
+            mode: "multiple",
+            inline: true,
+            defaultDate: targetDates,
+            dateFormat: "Y-m-d",
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: {
+                    shorthand: ['Ne', 'Po', 'Ut', 'St', 'Št', 'Pi', 'So'],
+                    longhand: ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota']
+                },
+                months: {
+                    shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'],
+                    longhand: ['Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún', 'Júl', 'August', 'September', 'Október', 'November', 'December']
+                }
+            },
+            clickOpens: false,
+            allowInput: false
+        });
     </script>
 </body>
 </html>

@@ -227,7 +227,7 @@
             <h1>🏥 navstevalekara.sk Watcher</h1>
             <p class="subtitle">Vytvorte sledovanie voľných termínov u lekára</p>
 
-            <form method="POST" action="/create">
+            <form method="POST" action="/create" autocomplete="off">
                 <div class="form-group">
                     <label for="doctor_url">URL lekára</label>
                     <input
@@ -242,8 +242,7 @@
 
                 <div class="form-group">
                     <label for="datepicker">Sledované dátumy</label>
-                    <input type="text" id="datepicker" placeholder="Kliknite pre výber dátumov..." readonly>
-                    <p class="help-text">Kliknite na dátumy v kalendári. Môžete vybrať viacero dátumov.</p>
+                    <input type="text" id="datepicker" style="display: none;">
 
                     <div id="selected-dates-display" class="selected-dates-display">
                         <span class="no-dates-selected">Zatiaľ nie sú vybrané žiadne dátumy</span>
@@ -373,11 +372,12 @@
             toggleNotificationFields();
 
             // Initialize flatpickr
-            flatpickr("#datepicker", {
+            const picker = flatpickr("#datepicker", {
                 mode: "multiple",
                 inline: true,
                 minDate: "today",
                 dateFormat: "Y-m-d",
+                disableMobile: true,
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
