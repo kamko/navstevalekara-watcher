@@ -183,7 +183,7 @@
                         <div class="date-input-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
                             <input
                                 type="date"
-                                name="target_dates[]"
+                                name="target_dates"
                                 required
                                 class="date-input"
                                 style="flex: 1;"
@@ -241,7 +241,7 @@
             newRow.innerHTML = `
                 <input
                     type="date"
-                    name="target_dates[]"
+                    name="target_dates"
                     required
                     class="date-input"
                     style="flex: 1;"
@@ -272,7 +272,7 @@
             }
 
             // Get existing dates to avoid duplicates
-            const existingInputs = document.querySelectorAll('input[name="target_dates[]"]');
+            const existingInputs = document.querySelectorAll('input[name="target_dates"]');
             const existingDates = new Set();
             existingInputs.forEach(input => {
                 if (input.value) {
@@ -296,7 +296,7 @@
                     newRow.innerHTML = `
                         <input
                             type="date"
-                            name="target_dates[]"
+                            name="target_dates"
                             value="${dateStr}"
                             required
                             class="date-input"
