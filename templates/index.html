@@ -220,18 +220,18 @@
                     <label>Typ notifikácie</label>
                     <div style="display: flex; gap: 24px; margin-bottom: 16px;">
                         <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="notification_type" value="telegram" checked onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
-                            <span>📱 Telegram</span>
+                            <input type="radio" name="notification_type" value="email" checked onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
+                            <span>📧 Email</span>
                         </label>
                         <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="radio" name="notification_type" value="email" onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
-                            <span>📧 Email</span>
+                            <input type="radio" name="notification_type" value="telegram" onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
+                            <span>📱 Telegram</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Telegram polia -->
-                <div id="telegram-fields">
+                <div id="telegram-fields" style="display: none;">
                     <div class="form-group">
                         <label for="telegram_bot_token">Telegram Bot Token</label>
                         <input
@@ -254,7 +254,7 @@
                 </div>
 
                 <!-- Email polia -->
-                <div id="email-fields" style="display: none;">
+                <div id="email-fields">
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input

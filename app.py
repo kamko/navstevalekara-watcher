@@ -496,6 +496,32 @@ def extract_doctor_code(url: str) -> str:
     return match.group(1)
 
 
+def extract_doctor_name_from_page(doctor_url: str) -> Optional[str]:
+    """Extract doctor name with diacritics from the doctor's page HTML."""
+    try:
+        response = requests.get(doctor_url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Look for doctor name in h1 tag
+        h1 = soup.find('h1')
+        if h1:
+            return h1.get_text(strip=True)
+
+        # Fallback: look for title tag
+        title = soup.find('title')
+        if title:
+            title_text = title.get_text(strip=True)
+            # Remove common suffixes from title
+            title_text = re.sub(r'\s*-\s*navstevalekara\.sk.*$', '', title_text, flags=re.IGNORECASE)
+            return title_text.strip()
+
+        return None
+    except Exception as e:
+        print(f"Failed to extract doctor name from page: {e}")
+        return None
+
+
 def parse_date_input(date_input: str) -> List[str]:
     """Parse date input - supports exact dates or week ranges."""
     from datetime import datetime, timedelta
@@ -550,13 +576,15 @@ async def create_watcher(
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
 
-        # Extract doctor name from URL (the part before -d)
-        doctor_name_match = re.search(r'/([^/]+)-d\d+\.html$', doctor_url)
-        if doctor_name_match:
-            # Convert URL-friendly name to readable name
-            doctor_name = doctor_name_match.group(1).replace('-', ' ').title()
-        else:
-            doctor_name = f"Doctor {doctor_code}"
+        # Extract doctor name from page HTML (with diacritics)
+        doctor_name = extract_doctor_name_from_page(doctor_url)
+        if not doctor_name:
+            # Fallback: extract from URL (without diacritics)
+            doctor_name_match = re.search(r'/([^/]+)-d\d+\.html$', doctor_url)
+            if doctor_name_match:
+                doctor_name = doctor_name_match.group(1).replace('-', ' ').title()
+            else:
+                doctor_name = f"Doctor {doctor_code}"
 
         # Validate and deduplicate dates
         validated_dates = []
