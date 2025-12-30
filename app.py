@@ -283,69 +283,12 @@ def build_email_html(doctor_name: str, doctor_url: str, slots: List[dict]) -> st
     """Build rich HTML email template."""
     sorted_slots = sorted(slots, key=lambda x: x['datetime'])
 
-    slots_html = ""
-    for slot in sorted_slots:
-        slots_html += f"""
-        <tr>
-            <td style="padding: 12px; border: 2px solid #000000; font-family: 'Courier New', Courier, monospace; font-weight: bold;">
-                {slot['date']}
-            </td>
-            <td style="padding: 12px; border: 2px solid #000000; font-family: 'Courier New', Courier, monospace;">
-                {slot['time']}
-            </td>
-        </tr>
-        """
-
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; padding: 20px;">
-            <tr>
-                <td align="center">
-                    <table width="600" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 2px solid #000000; border-radius: 0;">
-                        <tr>
-                            <td style="background: #000000; padding: 32px; border-radius: 0; text-align: center;">
-                                <h1 style="color: #FFFFFF; margin: 0; font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">NOVÉ TERMÍNY</h1>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 32px;">
-                                <h2 style="color: #000000; margin: 0 0 16px 0; font-size: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{doctor_name}</h2>
-                                <p style="color: #4A4A4A; margin: 0 0 24px 0; font-size: 14px; font-weight: bold;">
-                                    {'Nájdený 1 voľný termín:' if len(slots) == 1 else f'Nájdených {len(slots)} voľných termínov:'}
-                                </p>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #000000; border-radius: 0; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background-color: #000000;">
-                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #FFFFFF; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border: 2px solid #000000;">Dátum</th>
-                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #FFFFFF; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border: 2px solid #000000;">Čas</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>{slots_html}</tbody>
-                                </table>
-                                <div style="text-align: center; margin-top: 32px;">
-                                    <a href="{doctor_url}" style="display: inline-block; background: #000000; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border: 2px solid #000000; border-radius: 0; font-weight: bold; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">
-                                        Objednať sa na navstevalekara.sk
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 24px 32px; background-color: #F5F5F5; border-top: 2px solid #000000; border-radius: 0; text-align: center;">
-                                <p style="color: #4A4A4A; font-size: 12px; margin: 0;">
-                                    Túto notifikáciu ste dostali, pretože sledujete voľné termíny u tohto lekára.
-                                </p>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
-    </html>
-    """
+    template = templates.get_template("email_notification.html")
+    return template.render(
+        doctor_name=doctor_name,
+        doctor_url=doctor_url,
+        slots=sorted_slots
+    )
 
 
 def build_email_text(doctor_name: str, doctor_url: str, slots: List[dict]) -> str:
