@@ -34,7 +34,7 @@ class Watcher(Base):
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String(36), unique=True, index=True, nullable=False)
     doctor_name = Column(String(255), nullable=False)
-    doctor_url = Column(String(500), nullable=False)  # Added doctor URL
+    doctor_url = Column(String(500), nullable=False)
     doctor_code = Column(String(50), nullable=False)
     target_dates = Column(String, nullable=False)  # JSON string
     telegram_bot_token = Column(String(255), nullable=False)
@@ -70,7 +70,7 @@ templates = Jinja2Templates(directory="templates")
 scheduler = BackgroundScheduler()
 
 
-# Helper functions - Preserve exact logic from original doctor_notifier.py
+# Helper functions
 
 def calculate_week_offsets_for_dates(target_dates: List[str]) -> List[int]:
     """Calculate which week offsets to check based on target dates."""
@@ -275,7 +275,7 @@ def check_watcher_job(watcher_id: int):
         else:
             print(f"No new slots found")
 
-        # Auto-delete unavailable slots so they can be re-notified when they become available again
+        # Auto-delete unavailable slots
         currently_available_set = set()
         for slot in all_slots:
             currently_available_set.add(f"{slot['date']}_{slot['time']}")
@@ -556,7 +556,7 @@ async def delete_watcher(watcher_uuid: str):
 
 @app.get("/w/{watcher_uuid}/slots")
 async def get_notified_slots(watcher_uuid: str):
-    """Get all notified slots (all are available - unavailable ones are auto-deleted by background job)."""
+    """Get all notified slots for a watcher."""
     db = SessionLocal()
     try:
         watcher = db.query(Watcher).filter(Watcher.uuid == watcher_uuid).first()
@@ -564,7 +564,7 @@ async def get_notified_slots(watcher_uuid: str):
         if not watcher:
             raise HTTPException(status_code=404, detail="Watcher not found")
 
-        # Get all notified slots - all are available since background job deletes unavailable ones
+        # Get all notified slots
         notified_slots = db.query(NotifiedSlot).filter(
             NotifiedSlot.watcher_id == watcher.id
         ).order_by(NotifiedSlot.notified_at.desc()).all()

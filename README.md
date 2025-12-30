@@ -51,13 +51,11 @@ docker-compose logs -f
 
 ## Configuration
 
-### Finding the Doctor Code
+### Getting the Doctor URL
 
-1. Go to navstevalekara.sk and find your doctor
-2. Open browser DevTools (F12) → Network tab
-3. Click on any date/week in the calendar
-4. Look for the `order.php` request
-5. The `dc` parameter is the doctor code (e.g., `15313`)
+Simply copy the full URL from your doctor's page on navstevalekara.sk. The app will automatically extract the doctor code.
+
+Example: `https://www.navstevalekara.sk/lekari/gynekolog-gynekologia-s11003/bratislavsky-kraj-k300/bratislava-5-o504/petrzalka-m1015/mudr-radmila-sladicekova-phd-mph-d15313.html`
 
 ### Setting Up Telegram
 
