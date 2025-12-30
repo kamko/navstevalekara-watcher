@@ -188,10 +188,11 @@
                                 class="date-input"
                                 style="flex: 1;"
                             >
-                            <button type="button" onclick="addDateInput()" class="add-date-btn">+ Pridať dátum</button>
+                            <button type="button" onclick="this.parentElement.remove()" class="remove-date-btn">Odstrániť</button>
                         </div>
                     </div>
-                    <p class="help-text">Vyberte jeden alebo viac dátumov na sledovanie</p>
+                    <button type="button" onclick="addDateInput()" class="add-date-btn" style="margin-top: 8px; width: auto;">+ Pridať dátum</button>
+                    <p class="help-text" style="margin-top: 8px;">Vyberte jeden alebo viac dátumov na sledovanie</p>
 
                     <div class="date-range-section">
                         <div class="date-range-label">Alebo vyberte rozsah dátumov</div>
