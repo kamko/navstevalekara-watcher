@@ -157,6 +157,15 @@
         .add-range-btn:active {
             transform: translateY(0);
         }
+        input[type="radio"] {
+            width: auto;
+            margin-right: 8px;
+            accent-color: #667eea;
+        }
+        input[type="radio"]:checked + span {
+            font-weight: 600;
+            color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -206,26 +215,56 @@
                     </div>
                 </div>
 
+                <!-- Typ notifikácie -->
                 <div class="form-group">
-                    <label for="telegram_bot_token">Telegram Bot Token</label>
-                    <input
-                        type="text"
-                        id="telegram_bot_token"
-                        name="telegram_bot_token"
-                        required
-                        placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ"
-                    >
+                    <label>Typ notifikácie</label>
+                    <div style="display: flex; gap: 24px; margin-bottom: 16px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="notification_type" value="telegram" checked onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
+                            <span>📱 Telegram</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="notification_type" value="email" onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
+                            <span>📧 Email</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="telegram_chat_id">Telegram Chat ID</label>
-                    <input
-                        type="text"
-                        id="telegram_chat_id"
-                        name="telegram_chat_id"
-                        required
-                        placeholder="-1001234567890"
-                    >
+                <!-- Telegram polia -->
+                <div id="telegram-fields">
+                    <div class="form-group">
+                        <label for="telegram_bot_token">Telegram Bot Token</label>
+                        <input
+                            type="text"
+                            id="telegram_bot_token"
+                            name="telegram_bot_token"
+                            placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telegram_chat_id">Telegram Chat ID</label>
+                        <input
+                            type="text"
+                            id="telegram_chat_id"
+                            name="telegram_chat_id"
+                            placeholder="-1001234567890"
+                        >
+                    </div>
+                </div>
+
+                <!-- Email polia -->
+                <div id="email-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="vas.email@example.com"
+                        >
+                        <p class="help-text">Dostanete notifikácie na tento email</p>
+                    </div>
                 </div>
 
                 <button type="submit">Vytvoriť sledovanie</button>
@@ -317,6 +356,31 @@
             fromInput.value = '';
             toInput.value = '';
         }
+
+        function toggleNotificationFields() {
+            const type = document.querySelector('input[name="notification_type"]:checked').value;
+            const telegramFields = document.getElementById('telegram-fields');
+            const emailFields = document.getElementById('email-fields');
+            const telegramToken = document.getElementById('telegram_bot_token');
+            const telegramChat = document.getElementById('telegram_chat_id');
+            const emailInput = document.getElementById('email');
+
+            if (type === 'telegram') {
+                telegramFields.style.display = 'block';
+                emailFields.style.display = 'none';
+                telegramToken.required = true;
+                telegramChat.required = true;
+                emailInput.required = false;
+            } else {
+                telegramFields.style.display = 'none';
+                emailFields.style.display = 'block';
+                telegramToken.required = false;
+                telegramChat.required = false;
+                emailInput.required = true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', toggleNotificationFields);
     </script>
 </body>
 </html>

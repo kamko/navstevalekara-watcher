@@ -190,6 +190,16 @@
                     <div class="info-value">{{ watcher.doctor_code }}</div>
                 </div>
                 <div class="info-item">
+                    <div class="info-label">Typ notifikácie</div>
+                    <div class="info-value">
+                        {% if watcher.notification_type == 'email' %}
+                            📧 Email: {{ watcher.email }}
+                        {% else %}
+                            📱 Telegram
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
                     <div class="info-label">Posledná kontrola</div>
                     <div class="info-value">
                         {% if watcher.last_check_at %}

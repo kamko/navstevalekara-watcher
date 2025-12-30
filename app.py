@@ -2,6 +2,7 @@
 Doctor Appointment Watcher - SaaS Application
 Simple web app to monitor navstevalekara.sk for appointment slots
 """
+import os
 import re
 import uuid
 import json
@@ -10,6 +11,7 @@ from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -19,8 +21,28 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from apscheduler.schedulers.background import BackgroundScheduler
 
+# Load environment variables
+load_dotenv()
+
+# Mailjet configuration
+MAILJET_API_KEY = os.getenv('MAILJET_API_KEY')
+MAILJET_SECRET_KEY = os.getenv('MAILJET_SECRET_KEY')
+MAILJET_SENDER_EMAIL = os.getenv('MAILJET_SENDER_EMAIL')
+MAILJET_SENDER_NAME = os.getenv('MAILJET_SENDER_NAME', 'Doctor Appointment Watcher')
+
+
+def validate_mailjet_config() -> bool:
+    """Check if Mailjet is properly configured."""
+    return bool(MAILJET_API_KEY and MAILJET_SECRET_KEY and MAILJET_SENDER_EMAIL)
+
+
+# Log Mailjet status
+if validate_mailjet_config():
+    print("✓ Mailjet configured - Email notifications enabled")
+else:
+    print("⚠ Mailjet not configured - Only Telegram notifications available")
+
 # Database setup
-import os
 os.makedirs('data', exist_ok=True)
 DATABASE_URL = "sqlite:///./data/watchers.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -38,8 +60,17 @@ class Watcher(Base):
     doctor_url = Column(String(500), nullable=False)
     doctor_code = Column(String(50), nullable=False)
     target_dates = Column(String, nullable=False)  # JSON string
-    telegram_bot_token = Column(String(255), nullable=False)
-    telegram_chat_id = Column(String(255), nullable=False)
+
+    # Notification type selection
+    notification_type = Column(String(20), nullable=False, default='telegram')  # 'telegram' or 'email'
+
+    # Telegram fields - now nullable for email-only watchers
+    telegram_bot_token = Column(String(255), nullable=True)
+    telegram_chat_id = Column(String(255), nullable=True)
+
+    # Email field
+    email = Column(String(255), nullable=True)
+
     is_active = Column(Boolean, default=True)
     last_check_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -205,6 +236,132 @@ def send_telegram_notification(bot_token: str, chat_id: str, doctor_name: str, d
         return False
 
 
+def send_email_notification(email: str, doctor_name: str, doctor_url: str, slots: List[dict]) -> bool:
+    """Send notification via Email using Mailjet."""
+    if not slots:
+        return True
+
+    if not MAILJET_API_KEY or not MAILJET_SECRET_KEY or not MAILJET_SENDER_EMAIL:
+        print("ERROR: Mailjet not configured")
+        return False
+
+    try:
+        from mailjet_rest import Client
+
+        mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_SECRET_KEY), version='v3.1')
+
+        subject = f"🏥 {len(slots)} {'nový termín' if len(slots) == 1 else 'nových termínov'} u {doctor_name}"
+
+        html_content = build_email_html(doctor_name, doctor_url, slots)
+        text_content = build_email_text(doctor_name, doctor_url, slots)
+
+        data = {
+            'Messages': [{
+                "From": {"Email": MAILJET_SENDER_EMAIL, "Name": MAILJET_SENDER_NAME},
+                "To": [{"Email": email}],
+                "Subject": subject,
+                "TextPart": text_content,
+                "HTMLPart": html_content,
+            }]
+        }
+
+        result = mailjet.send.create(data=data)
+
+        if result.status_code == 200:
+            print(f"Email sent to {email} with {len(slots)} slot(s)")
+            return True
+        else:
+            print(f"Email failed: {result.status_code}")
+            return False
+
+    except Exception as e:
+        print(f"Email error: {e}")
+        return False
+
+
+def build_email_html(doctor_name: str, doctor_url: str, slots: List[dict]) -> str:
+    """Build rich HTML email template."""
+    sorted_slots = sorted(slots, key=lambda x: x['datetime'])
+
+    slots_html = ""
+    for slot in sorted_slots:
+        slots_html += f"""
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                <strong>{slot['date']}</strong>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                {slot['time']}
+            </td>
+        </tr>
+        """
+
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f7fafc;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7fafc; padding: 20px;">
+            <tr>
+                <td align="center">
+                    <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                        <tr>
+                            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+                                <h1 style="color: white; margin: 0; font-size: 28px;">🏥 Nové termíny!</h1>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 32px;">
+                                <h2 style="color: #1a202c; margin: 0 0 16px 0; font-size: 20px;">{doctor_name}</h2>
+                                <p style="color: #718096; margin: 0 0 24px 0; font-size: 14px;">
+                                    {'Nájdený 1 voľný termín:' if len(slots) == 1 else f'Nájdených {len(slots)} voľných termínov:'}
+                                </p>
+                                <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 8px;">
+                                    <thead>
+                                        <tr style="background-color: #f7fafc;">
+                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #718096; text-transform: uppercase;">Dátum</th>
+                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #718096; text-transform: uppercase;">Čas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>{slots_html}</tbody>
+                                </table>
+                                <div style="text-align: center; margin-top: 32px;">
+                                    <a href="{doctor_url}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                                        Objednať sa na navstevalekara.sk
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 24px 32px; background-color: #f7fafc; border-radius: 0 0 12px 12px; text-align: center;">
+                                <p style="color: #718096; font-size: 12px; margin: 0;">
+                                    Túto notifikáciu ste dostali, pretože sledujete voľné termíny u tohto lekára.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+
+
+def build_email_text(doctor_name: str, doctor_url: str, slots: List[dict]) -> str:
+    """Build plain text email fallback."""
+    sorted_slots = sorted(slots, key=lambda x: x['datetime'])
+
+    text = f"{doctor_name}\n\n"
+    text += f"{'Nájdený 1 voľný termín:' if len(slots) == 1 else f'Nájdených {len(slots)} voľných termínov:'}\n\n"
+
+    for slot in sorted_slots:
+        text += f"• {slot['date']} {slot['time']}\n"
+
+    text += f"\n\nObjednať sa: {doctor_url}\n"
+    return text
+
+
 # Background job function
 def check_watcher_job(watcher_id: int):
     """Background job to check appointments for a watcher."""
@@ -256,13 +413,23 @@ def check_watcher_job(watcher_id: int):
         # Send notification for new slots
         if new_slots:
             print(f"Found {len(new_slots)} new slot(s)")
-            success = send_telegram_notification(
-                watcher.telegram_bot_token,
-                watcher.telegram_chat_id,
-                watcher.doctor_name,
-                doctor_url,
-                new_slots
-            )
+
+            # Route based on notification type
+            if watcher.notification_type == 'email':
+                success = send_email_notification(
+                    watcher.email,
+                    watcher.doctor_name,
+                    doctor_url,
+                    new_slots
+                )
+            else:  # telegram (default)
+                success = send_telegram_notification(
+                    watcher.telegram_bot_token,
+                    watcher.telegram_chat_id,
+                    watcher.doctor_name,
+                    doctor_url,
+                    new_slots
+                )
 
             if success:
                 # Record notified slots
@@ -369,8 +536,10 @@ async def create_watcher(
     request: Request,
     doctor_url: str = Form(...),
     target_dates: List[str] = Form(...),
-    telegram_bot_token: str = Form(...),
-    telegram_chat_id: str = Form(...)
+    notification_type: str = Form(...),
+    telegram_bot_token: Optional[str] = Form(None),
+    telegram_chat_id: Optional[str] = Form(None),
+    email: Optional[str] = Form(None)
 ):
     """Create a new watcher."""
     db = SessionLocal()
@@ -406,6 +575,21 @@ async def create_watcher(
 
         dates = validated_dates
 
+        # Validate notification type
+        if notification_type not in ['telegram', 'email']:
+            raise HTTPException(status_code=400, detail="Neplatný typ notifikácie")
+
+        if notification_type == 'telegram':
+            if not telegram_bot_token or not telegram_chat_id:
+                raise HTTPException(status_code=400, detail="Pre Telegram sú povinné Bot Token a Chat ID")
+        elif notification_type == 'email':
+            if not email:
+                raise HTTPException(status_code=400, detail="Pre Email je povinná emailová adresa")
+            # Email validation
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, email):
+                raise HTTPException(status_code=400, detail="Neplatná emailová adresa")
+
         # Generate UUID
         watcher_uuid = str(uuid.uuid4())
 
@@ -416,8 +600,10 @@ async def create_watcher(
             doctor_url=doctor_url,
             doctor_code=doctor_code,
             target_dates=json.dumps(dates),
-            telegram_bot_token=telegram_bot_token,
-            telegram_chat_id=telegram_chat_id,
+            notification_type=notification_type,
+            telegram_bot_token=telegram_bot_token if notification_type == 'telegram' else None,
+            telegram_chat_id=telegram_chat_id if notification_type == 'telegram' else None,
+            email=email if notification_type == 'email' else None,
             is_active=True
         )
 
@@ -630,6 +816,24 @@ async def admin_panel(request: Request):
 async def startup_event():
     """Load all active watchers and start scheduler."""
     print("Starting application...")
+
+    # Migrate existing watchers to have notification_type
+    db = SessionLocal()
+    try:
+        existing = db.query(Watcher).filter(
+            Watcher.notification_type == None
+        ).all()
+
+        for watcher in existing:
+            watcher.notification_type = 'telegram'
+
+        if existing:
+            db.commit()
+            print(f"Migrated {len(existing)} existing watcher(s) to telegram notification type")
+    except Exception as e:
+        print(f"Migration error: {e}")
+    finally:
+        db.close()
 
     # Start scheduler
     scheduler.start()

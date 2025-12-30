@@ -183,6 +183,7 @@
                         <tr>
                             <th>Lekár</th>
                             <th>Stav</th>
+                            <th>Notifikácia</th>
                             <th>Sledované dátumy</th>
                             <th>Posledná kontrola</th>
                             <th>Vytvorené</th>
@@ -202,6 +203,13 @@
                                 <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
                                     {{ '✓ Aktívne' if watcher.is_active else '✗ Neaktívne' }}
                                 </span>
+                            </td>
+                            <td>
+                                {% if watcher.notification_type == 'email' %}
+                                    <span style="font-size: 12px; color: #718096;">📧 Email</span>
+                                {% else %}
+                                    <span style="font-size: 12px; color: #718096;">📱 Telegram</span>
+                                {% endif %}
                             </td>
                             <td>
                                 {{ watcher.target_dates_count }} {{ 'dátum' if watcher.target_dates_count == 1 else 'dátumy' if watcher.target_dates_count <= 4 else 'dátumov' }}

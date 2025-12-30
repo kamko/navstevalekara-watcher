@@ -12,4 +12,6 @@ dependencies = [
     "beautifulsoup4",
     "jinja2",
     "python-multipart",
+    "mailjet-rest",
+    "python-dotenv",
 ]
