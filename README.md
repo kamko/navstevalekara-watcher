@@ -85,20 +85,6 @@ MAILJET_SENDER_NAME=Doctor Appointment Watcher
 4. Add your bot to the channel/group
 5. Get the chat ID (use [@userinfobot](https://t.me/userinfobot) or check bot updates)
 
-## Project Structure
-
-```
-navstevalekara-notif/
-├── app.py                 # Main application (FastAPI + SQLAlchemy + APScheduler)
-├── templates/
-│   ├── index.html        # Create watcher form
-│   └── watcher.html      # View watcher status
-├── pyproject.toml        # Dependencies
-├── Dockerfile            # Docker image
-├── docker-compose.yml    # Docker deployment
-└── watchers.db           # SQLite database (auto-created)
-```
-
 ## Tech Stack
 
 - **Backend**: FastAPI
