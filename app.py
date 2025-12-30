@@ -250,7 +250,7 @@ def send_email_notification(email: str, doctor_name: str, doctor_url: str, slots
 
         mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_SECRET_KEY), version='v3.1')
 
-        subject = f"🏥 {len(slots)} {'nový termín' if len(slots) == 1 else 'nových termínov'} u {doctor_name}"
+        subject = f"{len(slots)} {'nový termín' if len(slots) == 1 else 'nových termínov'} u {doctor_name}"
 
         html_content = build_email_html(doctor_name, doctor_url, slots)
         text_content = build_email_text(doctor_name, doctor_url, slots)
@@ -287,10 +287,10 @@ def build_email_html(doctor_name: str, doctor_url: str, slots: List[dict]) -> st
     for slot in sorted_slots:
         slots_html += f"""
         <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
-                <strong>{slot['date']}</strong>
+            <td style="padding: 12px; border: 2px solid #000000; font-family: 'Courier New', Courier, monospace; font-weight: bold;">
+                {slot['date']}
             </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 12px; border: 2px solid #000000; font-family: 'Courier New', Courier, monospace;">
                 {slot['time']}
             </td>
         </tr>
@@ -300,41 +300,41 @@ def build_email_html(doctor_name: str, doctor_url: str, slots: List[dict]) -> st
     <!DOCTYPE html>
     <html>
     <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f7fafc;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7fafc; padding: 20px;">
+    <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; padding: 20px;">
             <tr>
                 <td align="center">
-                    <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <table width="600" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border: 2px solid #000000; border-radius: 0;">
                         <tr>
-                            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
-                                <h1 style="color: white; margin: 0; font-size: 28px;">🏥 Nové termíny!</h1>
+                            <td style="background: #000000; padding: 32px; border-radius: 0; text-align: center;">
+                                <h1 style="color: #FFFFFF; margin: 0; font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">NOVÉ TERMÍNY</h1>
                             </td>
                         </tr>
                         <tr>
                             <td style="padding: 32px;">
-                                <h2 style="color: #1a202c; margin: 0 0 16px 0; font-size: 20px;">{doctor_name}</h2>
-                                <p style="color: #718096; margin: 0 0 24px 0; font-size: 14px;">
+                                <h2 style="color: #000000; margin: 0 0 16px 0; font-size: 20px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{doctor_name}</h2>
+                                <p style="color: #4A4A4A; margin: 0 0 24px 0; font-size: 14px; font-weight: bold;">
                                     {'Nájdený 1 voľný termín:' if len(slots) == 1 else f'Nájdených {len(slots)} voľných termínov:'}
                                 </p>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="border: 2px solid #000000; border-radius: 0; border-collapse: collapse;">
                                     <thead>
-                                        <tr style="background-color: #f7fafc;">
-                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #718096; text-transform: uppercase;">Dátum</th>
-                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #718096; text-transform: uppercase;">Čas</th>
+                                        <tr style="background-color: #000000;">
+                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #FFFFFF; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border: 2px solid #000000;">Dátum</th>
+                                            <th style="padding: 12px; text-align: left; font-size: 12px; color: #FFFFFF; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; border: 2px solid #000000;">Čas</th>
                                         </tr>
                                     </thead>
                                     <tbody>{slots_html}</tbody>
                                 </table>
                                 <div style="text-align: center; margin-top: 32px;">
-                                    <a href="{doctor_url}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                                    <a href="{doctor_url}" style="display: inline-block; background: #000000; color: #FFFFFF; text-decoration: none; padding: 14px 32px; border: 2px solid #000000; border-radius: 0; font-weight: bold; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">
                                         Objednať sa na navstevalekara.sk
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td style="padding: 24px 32px; background-color: #f7fafc; border-radius: 0 0 12px 12px; text-align: center;">
-                                <p style="color: #718096; font-size: 12px; margin: 0;">
+                            <td style="padding: 24px 32px; background-color: #F5F5F5; border-top: 2px solid #000000; border-radius: 0; text-align: center;">
+                                <p style="color: #4A4A4A; font-size: 12px; margin: 0;">
                                     Túto notifikáciu ste dostali, pretože sledujete voľné termíny u tohto lekára.
                                 </p>
                             </td>
