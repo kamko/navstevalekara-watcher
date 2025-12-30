@@ -845,7 +845,32 @@ async def startup_event():
     """Load all active watchers and start scheduler."""
     print("Starting application...")
 
-    # Migrate existing watchers to have notification_type
+    # Schema migration: Add new columns if they don't exist
+    db = SessionLocal()
+    try:
+        # Check if notification_type column exists
+        result = db.execute("PRAGMA table_info(watchers)")
+        columns = [row[1] for row in result.fetchall()]
+
+        if 'notification_type' not in columns:
+            print("Adding notification_type column...")
+            db.execute("ALTER TABLE watchers ADD COLUMN notification_type VARCHAR(20) DEFAULT 'telegram'")
+            db.commit()
+            print("✓ Added notification_type column")
+
+        if 'email' not in columns:
+            print("Adding email column...")
+            db.execute("ALTER TABLE watchers ADD COLUMN email VARCHAR(255)")
+            db.commit()
+            print("✓ Added email column")
+
+    except Exception as e:
+        print(f"Schema migration error: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+    # Data migration: Set notification_type for existing watchers
     db = SessionLocal()
     try:
         existing = db.query(Watcher).filter(
@@ -859,7 +884,7 @@ async def startup_event():
             db.commit()
             print(f"Migrated {len(existing)} existing watcher(s) to telegram notification type")
     except Exception as e:
-        print(f"Migration error: {e}")
+        print(f"Data migration error: {e}")
     finally:
         db.close()
 
