@@ -13,8 +13,8 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, Helvetica, sans-serif;
+            background: #FFFFFF;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,207 +24,188 @@
         }
         .card {
             background: white;
-            border-radius: 12px;
+            border: 2px solid #000000;
             padding: 32px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #1a202c;
+            color: #000000;
             margin-bottom: 8px;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         .subtitle {
-            color: #718096;
+            color: #4A4A4A;
             margin-bottom: 32px;
             font-size: 14px;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
-            color: #2d3748;
-            font-weight: 500;
+            margin-bottom: 8px;
+            color: #000000;
+            font-weight: bold;
             font-size: 14px;
+            text-transform: uppercase;
         }
         input, textarea {
             width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s;
+            padding: 12px;
+            border: 2px solid #000000;
+            border-radius: 0;
+            font-size: 16px;
+            font-family: Arial, Helvetica, sans-serif;
         }
         input:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border: 4px solid #000000;
         }
         textarea {
             resize: vertical;
             min-height: 80px;
-            font-family: inherit;
         }
         .help-text {
             font-size: 12px;
-            color: #718096;
+            color: #4A4A4A;
             margin-top: 4px;
         }
         button {
             width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
+            background: #000000;
+            color: #FFFFFF;
+            border: 2px solid #000000;
+            padding: 14px 24px;
+            border-radius: 0;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        button:active {
-            transform: translateY(0);
-        }
-        .add-date-btn {
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .add-date-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
-        }
-        .add-date-btn:active {
-            transform: translateY(0);
-        }
-        .remove-date-btn {
-            padding: 10px 16px;
-            background: #fee2e2;
-            color: #991b1b;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .remove-date-btn:hover {
-            background: #fecaca;
-        }
-        .date-range-section {
-            margin-top: 16px;
-            padding: 16px;
-            background: #f7fafc;
-            border-radius: 8px;
-            border: 2px dashed #cbd5e0;
-        }
-        .date-range-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 8px;
-        }
-        .date-range-inputs {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .date-range-inputs input {
-            flex: 1;
-        }
-        .add-range-btn {
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .add-range-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        .add-range-btn:active {
-            transform: translateY(0);
+            background: #FFFFFF;
+            color: #000000;
         }
         input[type="radio"] {
-            width: auto;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #000000;
+            background: #FFFFFF;
             margin-right: 8px;
-            accent-color: #667eea;
+            cursor: pointer;
+        }
+        input[type="radio"]:checked {
+            background: #000000;
         }
         input[type="radio"]:checked + span {
-            font-weight: 600;
-            color: #667eea;
+            font-weight: bold;
+            color: #000000;
         }
         #datepicker {
             width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
+            padding: 12px;
+            border: 2px solid #000000;
+            border-radius: 0;
             font-size: 14px;
             cursor: pointer;
             background: white;
         }
         #datepicker:focus {
             outline: none;
-            border-color: #667eea;
+            border: 4px solid #000000;
         }
         .flatpickr-calendar {
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-            border: 2px solid #e2e8f0 !important;
-            border-radius: 8px !important;
+            background: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .flatpickr-months {
+            background: #000000 !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+        .flatpickr-month, .flatpickr-current-month {
+            color: #FFFFFF !important;
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
+            color: #FFFFFF !important;
+        }
+        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+            background: #4A4A4A !important;
+        }
+        .flatpickr-weekdays {
+            background: #F5F5F5 !important;
+            border-bottom: 1px solid #000000 !important;
+        }
+        .flatpickr-weekday {
+            color: #000000 !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            font-size: 11px !important;
+        }
+        .flatpickr-day {
+            border: 1px solid #E5E5E5 !important;
+            border-radius: 0 !important;
+            color: #000000 !important;
         }
         .flatpickr-day.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            border-color: #667eea !important;
+            background: #000000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            font-weight: bold !important;
         }
         .flatpickr-day.selected:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            border-color: #667eea !important;
+            background: #000000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #000000 !important;
         }
         .flatpickr-day:hover {
-            background: #f7fafc !important;
-            border-color: #667eea !important;
+            background: #F5F5F5 !important;
+            border: 2px solid #000000 !important;
+        }
+        .flatpickr-day.disabled {
+            color: #E5E5E5 !important;
         }
         .selected-dates-display {
             margin-top: 12px;
             padding: 12px;
-            background: #f7fafc;
-            border-radius: 6px;
+            background: #F5F5F5;
+            border: 2px solid #000000;
             min-height: 40px;
         }
         .selected-date-tag {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #FFFFFF;
+            color: #000000;
+            border: 2px solid #000000;
             padding: 6px 12px;
-            border-radius: 4px;
             margin: 4px;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
         }
         .no-dates-selected {
-            color: #718096;
+            color: #4A4A4A;
             font-size: 13px;
-            font-style: italic;
+        }
+        @media (max-width: 640px) {
+            .card {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>🏥 navstevalekara.sk Watcher</h1>
+            <h1>navstevalekara.sk Watcher</h1>
             <p class="subtitle">Vytvorte sledovanie voľných termínov u lekára</p>
 
             <form method="POST" action="/create" autocomplete="off">
@@ -256,13 +237,13 @@
                 <div class="form-group">
                     <label>Typ notifikácie</label>
                     <div style="display: flex; gap: 24px; margin-bottom: 16px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
+                        <label style="display: flex; align-items: center; cursor: pointer; text-transform: none;">
                             <input type="radio" name="notification_type" value="email" checked onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
-                            <span>📧 Email</span>
+                            <span>Email</span>
                         </label>
-                        <label style="display: flex; align-items: center; cursor: pointer;">
+                        <label style="display: flex; align-items: center; cursor: pointer; text-transform: none;">
                             <input type="radio" name="notification_type" value="telegram" onchange="toggleNotificationFields()" style="width: auto; margin-right: 8px;">
-                            <span>📱 Telegram</span>
+                            <span>Telegram</span>
                         </label>
                     </div>
                 </div>

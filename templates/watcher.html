@@ -13,8 +13,8 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, Helvetica, sans-serif;
+            background: #FFFFFF;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,57 +24,61 @@
         }
         .card {
             background: white;
-            border-radius: 12px;
+            border: 2px solid #000000;
             padding: 32px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
         h1 {
-            color: #1a202c;
-            margin-bottom: 4px;
+            color: #000000;
+            margin-bottom: 8px;
             font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border: 2px solid #000000;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 16px;
+            text-transform: uppercase;
         }
         .status-badge.active {
-            background: #c6f6d5;
-            color: #22543d;
+            background: #000000;
+            color: #FFFFFF;
         }
         .status-badge.inactive {
-            background: #fed7d7;
-            color: #742a2a;
+            background: #FFFFFF;
+            color: #000000;
         }
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            gap: 0;
             margin: 20px 0;
+            border: 2px solid #000000;
         }
         .info-item {
             padding: 12px;
-            background: #f7fafc;
-            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid #000000;
         }
         .info-label {
             font-size: 12px;
-            color: #718096;
+            color: #000000;
             margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         .info-value {
             font-size: 14px;
-            color: #1a202c;
-            font-weight: 500;
+            color: #000000;
         }
         .url-box {
-            background: #edf2f7;
+            background: #FFFFFF;
             padding: 16px;
-            border-radius: 8px;
+            border: 2px solid #000000;
             margin: 20px 0;
             display: flex;
             align-items: center;
@@ -83,42 +87,45 @@
         .url-box input {
             flex: 1;
             padding: 8px;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
+            border: 2px solid #000000;
+            border-radius: 0;
             font-size: 12px;
-            font-family: monospace;
+            font-family: 'Courier New', Courier, monospace;
         }
         .btn {
             padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
+            border: 2px solid #000000;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
+            text-transform: uppercase;
         }
         .btn-primary {
-            background: #667eea;
-            color: white;
+            background: #000000;
+            color: #FFFFFF;
         }
         .btn-primary:hover {
-            background: #5a67d8;
+            background: #FFFFFF;
+            color: #000000;
         }
         .btn-danger {
-            background: #f56565;
-            color: white;
+            background: #FF0000;
+            color: #FFFFFF;
+            border-color: #FF0000;
         }
         .btn-danger:hover {
-            background: #e53e3e;
+            background: #FFFFFF;
+            color: #FF0000;
         }
         .btn-secondary {
-            background: #edf2f7;
-            color: #2d3748;
+            background: #FFFFFF;
+            color: #000000;
         }
         .btn-secondary:hover {
-            background: #e2e8f0;
+            background: #000000;
+            color: #FFFFFF;
         }
         .actions {
             display: flex;
@@ -128,55 +135,112 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 2px solid #000000;
         }
         th {
             text-align: left;
             padding: 12px;
-            background: #f7fafc;
+            background: #000000;
             font-size: 12px;
-            color: #718096;
-            font-weight: 600;
+            color: #FFFFFF;
+            font-weight: bold;
             text-transform: uppercase;
         }
         td {
             padding: 12px;
-            border-top: 1px solid #e2e8f0;
+            border: 1px solid #000000;
             font-size: 14px;
-            color: #2d3748;
+            color: #000000;
         }
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #718096;
+            color: #000000;
+            border: 2px solid #000000;
         }
         .section-title {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 16px;
-            color: #1a202c;
+            color: #000000;
+            text-transform: uppercase;
         }
         .checking-status {
             display: inline-block;
             margin-left: 8px;
             font-size: 12px;
-            color: #718096;
+            color: #000000;
+            text-transform: uppercase;
         }
         .flatpickr-calendar {
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-            border: 2px solid #e2e8f0 !important;
-            border-radius: 8px !important;
+            background: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .flatpickr-months {
+            background: #000000 !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+        .flatpickr-month, .flatpickr-current-month {
+            color: #FFFFFF !important;
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
+            color: #FFFFFF !important;
+        }
+        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+            background: #4A4A4A !important;
+        }
+        .flatpickr-weekdays {
+            background: #F5F5F5 !important;
+            border-bottom: 1px solid #000000 !important;
+        }
+        .flatpickr-weekday {
+            color: #000000 !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            font-size: 11px !important;
+        }
+        .flatpickr-day {
+            border: 1px solid #E5E5E5 !important;
+            border-radius: 0 !important;
+            color: #000000 !important;
         }
         .flatpickr-day.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            border-color: #667eea !important;
+            background: #000000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            font-weight: bold !important;
         }
         .flatpickr-day.selected:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            border-color: #667eea !important;
+            background: #000000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+        }
+        .flatpickr-day:hover {
+            background: #F5F5F5 !important;
+            border: 2px solid #000000 !important;
+        }
+        .flatpickr-day.disabled {
+            color: #E5E5E5 !important;
         }
         #watcher-datepicker + .flatpickr-calendar {
             pointer-events: none;
             opacity: 0.9;
+        }
+        @media (max-width: 640px) {
+            .card {
+                padding: 16px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -185,10 +249,10 @@
         <div class="card">
             <h1>{{ watcher.doctor_name }}</h1>
             <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
-                {{ '✓ Aktívne' if watcher.is_active else '✗ Neaktívne' }}
+                {{ 'Aktívne' if watcher.is_active else 'Neaktívne' }}
             </span>
             <div style="margin-top: 8px;">
-                <a href="{{ watcher.doctor_url }}" target="_blank" class="text-blue-600 text-sm" style="color: #3b82f6; text-decoration: none;">Zobraziť na navstevalekara.sk →</a>
+                <a href="{{ watcher.doctor_url }}" target="_blank" style="color: #000000; text-decoration: underline; font-size: 12px;">Zobraziť na navstevalekara.sk →</a>
             </div>
 
             <div class="url-box">
@@ -211,9 +275,9 @@
                     <div class="info-label">Typ notifikácie</div>
                     <div class="info-value">
                         {% if watcher.notification_type == 'email' %}
-                            📧 Email: {{ watcher.email }}
+                            Email: {{ watcher.email }}
                         {% else %}
-                            📱 Telegram
+                            Telegram
                         {% endif %}
                     </div>
                 </div>
@@ -302,7 +366,7 @@
 
             isChecking = true;
             const statusEl = document.getElementById('checking-status');
-            statusEl.textContent = '⟳ Kontrolujem...';
+            statusEl.textContent = 'KONTROLUJEM...';
 
             try {
                 const response = await fetch(window.location.pathname + '/slots');
@@ -310,14 +374,14 @@
 
                 updateSlotsTable(data.slots);
 
-                statusEl.textContent = '✓ Aktualizované';
+                statusEl.textContent = 'AKTUALIZOVANÉ';
                 setTimeout(() => {
                     statusEl.textContent = '';
                 }, 2000);
 
             } catch (error) {
                 console.error('Error checking slots:', error);
-                statusEl.textContent = '✗ Chyba';
+                statusEl.textContent = 'CHYBA';
                 setTimeout(() => {
                     statusEl.textContent = '';
                 }, 2000);

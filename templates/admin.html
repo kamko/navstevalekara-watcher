@@ -12,8 +12,8 @@
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, Helvetica, sans-serif;
+            background: #FFFFFF;
             min-height: 100vh;
             padding: 20px;
         }
@@ -23,141 +23,169 @@
         }
         .header {
             background: white;
-            border-radius: 12px;
+            border: 2px solid #000000;
             padding: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
         h1 {
-            color: #1a202c;
-            margin-bottom: 4px;
-            font-size: 28px;
+            color: #000000;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         .subtitle {
-            color: #718096;
+            color: #4A4A4A;
             font-size: 14px;
         }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            gap: 0;
             margin-top: 16px;
+            border: 2px solid #000000;
         }
         .stat-box {
-            background: #f7fafc;
+            background: #FFFFFF;
             padding: 16px;
-            border-radius: 8px;
+            border: 1px solid #000000;
         }
         .stat-label {
             font-size: 12px;
-            color: #718096;
-            margin-bottom: 4px;
+            color: #000000;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a202c;
+            font-size: 48px;
+            font-weight: bold;
+            color: #000000;
+            font-family: 'Courier New', Courier, monospace;
         }
         .card {
             background: white;
-            border-radius: 12px;
+            border: 2px solid #000000;
             padding: 32px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            border: 2px solid #000000;
         }
         th {
             text-align: left;
             padding: 12px;
-            background: #f7fafc;
+            background: #000000;
             font-size: 12px;
-            color: #718096;
-            font-weight: 600;
+            color: #FFFFFF;
+            font-weight: bold;
             text-transform: uppercase;
         }
         td {
             padding: 12px;
-            border-top: 1px solid #e2e8f0;
+            border: 1px solid #000000;
             font-size: 14px;
-            color: #2d3748;
+            color: #000000;
         }
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border: 2px solid #000000;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: bold;
+            text-transform: uppercase;
         }
         .status-badge.active {
-            background: #c6f6d5;
-            color: #22543d;
+            background: #000000;
+            color: #FFFFFF;
         }
         .status-badge.inactive {
-            background: #fed7d7;
-            color: #742a2a;
+            background: #FFFFFF;
+            color: #000000;
         }
         .btn {
             padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
+            border: 2px solid #000000;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
             margin-right: 4px;
+            text-transform: uppercase;
         }
         .btn-primary {
-            background: #667eea;
-            color: white;
+            background: #000000;
+            color: #FFFFFF;
         }
         .btn-primary:hover {
-            background: #5a67d8;
+            background: #FFFFFF;
+            color: #000000;
         }
         .btn-danger {
-            background: #f56565;
-            color: white;
+            background: #FF0000;
+            color: #FFFFFF;
+            border-color: #FF0000;
         }
         .btn-danger:hover {
-            background: #e53e3e;
+            background: #FFFFFF;
+            color: #FF0000;
         }
         .btn-secondary {
-            background: #edf2f7;
-            color: #2d3748;
+            background: #FFFFFF;
+            color: #000000;
         }
         .btn-secondary:hover {
-            background: #e2e8f0;
+            background: #000000;
+            color: #FFFFFF;
         }
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #718096;
+            color: #000000;
+            border: 2px solid #000000;
+            text-transform: uppercase;
         }
         .doctor-name {
-            font-weight: 600;
-            color: #1a202c;
+            font-weight: bold;
+            color: #000000;
         }
         .doctor-code {
             font-size: 12px;
-            color: #718096;
+            color: #4A4A4A;
+            font-family: 'Courier New', Courier, monospace;
         }
         .watcher-link {
-            color: #3b82f6;
-            text-decoration: none;
+            color: #000000;
+            text-decoration: underline;
             font-size: 12px;
         }
         .watcher-link:hover {
-            text-decoration: underline;
+            background: #000000;
+            color: #FFFFFF;
+        }
+        @media (max-width: 640px) {
+            .header, .card {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            table {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔧 Admin Panel</h1>
+            <h1>Admin Panel</h1>
             <p class="subtitle">Správa všetkých sledovaní</p>
 
             <div class="stats">
@@ -201,14 +229,14 @@
                             </td>
                             <td>
                                 <span class="status-badge {{ 'active' if watcher.is_active else 'inactive' }}">
-                                    {{ '✓ Aktívne' if watcher.is_active else '✗ Neaktívne' }}
+                                    {{ 'Aktívne' if watcher.is_active else 'Neaktívne' }}
                                 </span>
                             </td>
                             <td>
                                 {% if watcher.notification_type == 'email' %}
-                                    <span style="font-size: 12px; color: #718096;">📧 Email</span>
+                                    <span style="font-size: 12px; color: #000000;">Email</span>
                                 {% else %}
-                                    <span style="font-size: 12px; color: #718096;">📱 Telegram</span>
+                                    <span style="font-size: 12px; color: #000000;">Telegram</span>
                                 {% endif %}
                             </td>
                             <td>
