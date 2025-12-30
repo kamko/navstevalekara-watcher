@@ -153,26 +153,6 @@
             margin-bottom: 16px;
             color: #1a202c;
         }
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        .status-indicator.available {
-            background: #48bb78;
-        }
-        .status-indicator.unavailable {
-            background: #f56565;
-        }
-        .slot-row.unavailable {
-            background: #fef2f2;
-        }
-        .btn-small {
-            padding: 4px 8px;
-            font-size: 12px;
-        }
         .checking-status {
             display: inline-block;
             margin-left: 8px;
@@ -253,7 +233,6 @@
                     <table id="slots-table">
                         <thead>
                             <tr>
-                                <th>Stav</th>
                                 <th>Dátum</th>
                                 <th>Čas</th>
                                 <th>Notifikované</th>
@@ -261,8 +240,7 @@
                         </thead>
                         <tbody id="slots-tbody">
                             {% for slot in notified_slots %}
-                            <tr class="slot-row" data-slot-id="{{ slot.id }}">
-                                <td><span class="status-indicator available"></span> Voľný</td>
+                            <tr data-slot-id="{{ slot.id }}">
                                 <td>{{ slot.date }}</td>
                                 <td>{{ slot.time }}</td>
                                 <td>{{ slot.notified_at.strftime('%Y-%m-%d %H:%M') }}</td>
@@ -322,7 +300,6 @@
         function updateSlotsTable(slots) {
             const tbody = document.getElementById('slots-tbody');
             const countEl = document.getElementById('slots-count');
-            const emptyState = document.getElementById('empty-state');
             const tableContainer = document.getElementById('slots-table-container');
 
             countEl.textContent = slots.length;
@@ -340,7 +317,6 @@
                     <table id="slots-table">
                         <thead>
                             <tr>
-                                <th>Stav</th>
                                 <th>Dátum</th>
                                 <th>Čas</th>
                                 <th>Notifikované</th>
@@ -356,11 +332,7 @@
 
             slots.forEach(slot => {
                 const row = document.createElement('tr');
-                row.className = slot.is_still_available ? 'slot-row' : 'slot-row unavailable';
                 row.dataset.slotId = slot.id;
-
-                const statusText = slot.is_still_available ? 'Voľný' : 'Obsadený';
-                const statusClass = slot.is_still_available ? 'available' : 'unavailable';
 
                 const notifiedDate = new Date(slot.notified_at);
                 const formattedDate = notifiedDate.toLocaleString('sk-SK', {
@@ -372,7 +344,6 @@
                 }).replace(',', '');
 
                 row.innerHTML = `
-                    <td><span class="status-indicator ${statusClass}"></span> ${statusText}</td>
                     <td>${slot.date}</td>
                     <td>${slot.time}</td>
                     <td>${formattedDate}</td>
