@@ -14,6 +14,7 @@ RUN uv pip install --system --no-cache -r pyproject.toml
 # Copy application files
 COPY app.py .
 COPY templates/ templates/
+COPY static/ static/
 
 # Expose port
 EXPOSE 8000

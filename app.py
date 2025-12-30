@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -65,6 +66,7 @@ Base.metadata.create_all(bind=engine)
 # FastAPI app
 app = FastAPI(title="Doctor Appointment Watcher")
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Scheduler
 scheduler = BackgroundScheduler()
