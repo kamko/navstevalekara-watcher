@@ -50,3 +50,6 @@ Thumbs.db
 
 # IDE/Tools
 .claude/
+
+# Original CLI tool with secrets
+doctor_notifier.py
